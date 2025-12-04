@@ -1,0 +1,8 @@
+#1 Set executable permission
+chmod +x /home/pi/rpi_nightly/nightly_update.py
+
+#2 Open crontab
+crontab -e
+
+#3 Add to last line
+0 0 * * * /usr/bin/python3 /home/pi/rpi_nightly/nightly_update.py

@@ -1,5 +1,0 @@
-# Chạy chương trình main_app.py vào lúc 00 giờ 30 phút hàng ngày
-# (Phải dùng đường dẫn tuyệt đối cho Python và script)
-# Ví dụ: Giả sử path là /home/pi/forex_bot/
-
-30 0 * * * /home/pi/forex_bot/venv/bin/python /home/pi/forex_bot/main_app.py >> /home/pi/forex_bot/cron.log 2>&1

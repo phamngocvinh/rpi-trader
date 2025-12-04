@@ -13,7 +13,7 @@ ASSET_FILE_NAME = "released_package.7z" # The name of your .7z file attached to 
 GITHUB_LATEST_RELEASE_API = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO_NAME}/releases/latest"
 
 # 2. Full path to the target directory for the EXTRACTED files.
-LOCAL_TARGET_DIR = "/test/"
+LOCAL_TARGET_DIR = "/home/pi/rpi_trader/"
 
 # 3. Local name for the archive file (.7z).
 ARCHIVE_FILE_NAME = "released_package.7z"

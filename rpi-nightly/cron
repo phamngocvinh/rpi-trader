@@ -1,8 +1,0 @@
-#1 Ca61o quyền run script
-chmod +x /home/pi/scripts/update_script.py
-
-#2 Mở crontab
-crontab -e
-
-#3 Add vào cuối file
-0 0 * * * /usr/bin/python3 /home/pi/cron_scripts/update_script.py
