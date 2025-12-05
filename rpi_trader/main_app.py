@@ -11,7 +11,7 @@ from modules import (
 )
 
 def read_trigger_mode():
-    """Reads trigger.txt file to get the mode (0 or 1)"""
+    """Reads trigger.txt file to get the mode (0, 1, or 2)"""
     try:
         if not os.path.exists(config.TRIGGER_FILE):
             # Create default file if it doesn't exist
@@ -21,7 +21,12 @@ def read_trigger_mode():
             
         with open(config.TRIGGER_FILE, "r") as f:
             content = f.read().strip()
-            return content
+            # Ensure only valid modes are returned, default to '0' if corrupted
+            if content in ["0", "1", "2"]:
+                return content
+            else:
+                return "0"
+                
     except Exception as e:
         print(f"Error reading trigger file: {e}")
         return "0"
@@ -49,18 +54,25 @@ def execute_trading_logic():
         df_h1  = market_data.get('1h')
 
         # #7: Process by Mode
-        if mode == "1":
-            # --- Mode 1: Order Management (Close/Trailing) ---
+        if mode == "1" or mode == "2":
+            # --- Mode 1 (BUY) or 2 (SELL): Order Management (Close/Trailing) ---
             
             # 1. Close Order by RSI (M30)
             rsi_signal, rsi_msg = close_order_by_rsi.check_condition(df_m30)
+            
             if rsi_signal:
-                send_telegram_message(rsi_msg)
-                
-            # 2. Kijun Trailing Stop (H1)
-            kijun_signal, kijun_msg = kijun_sen_trailing_stop.check_condition(df_h1)
+                # Filter RSI message based on current trade mode
+                if mode == "1" and "Bearish" in rsi_msg:
+                    # Mode 1 (Active BUY) only cares about Bearish divergence (Close BUY)
+                    send_telegram_message(rsi_msg)
+                elif mode == "2" and "Bullish" in rsi_msg:
+                    # Mode 2 (Active SELL) only cares about Bullish divergence (Close SELL)
+                    send_telegram_message(rsi_msg)
+
+            # 2. Kijun Trailing Stop (H1) - Pass the current mode
+            kijun_signal, kijun_msg = kijun_sen_trailing_stop.check_condition(df_h1, mode)
             if kijun_signal:
-                # This module always returns a value to update trailing
+                # This module only returns True if Kijun moved favorably for the current mode
                 send_telegram_message(kijun_msg)
 
         elif mode == "0":
@@ -80,7 +92,7 @@ def execute_trading_logic():
                     send_telegram_message(sr_msg)
         
         else:
-            print("Invalid mode in trigger.txt. Use '0' or '1'.")
+            print("Invalid mode in trigger.txt. Please use '0', '1', or '2'.")
 
     else:
         print("Failed to fetch market data.")
@@ -100,6 +112,4 @@ def main():
         send_telegram_message(f"⚠️ Bot Critical Error: {e}")
 
 if __name__ == "__main__":
-    # The first run needs to initialize the telegram message and then run the logic
-    # The logic is now wrapped in execute_trading_logic and run once.
     main()

@@ -1,37 +1,39 @@
 import os
+import sys
 
 # Control file name (consistent with main_app.py)
 TRIGGER_FILE = "trigger.txt"
 
 def toggle_trigger_file():
     """
-    Toggles the content of the trigger.txt file between '0' and '1'.
-    '0': Entry mode (Search for opportunities)
-    '1': Management mode (Close/Trailing Stop)
+    Sets the content of the trigger.txt file to '0', '1', or '2' based on the command line argument.
+    0: Entry Mode (No Trade, Search for opportunities)
+    1: Management Mode (Active BUY Trade)
+    2: Management Mode (Active SELL Trade)
     """
-    new_state = "1" # Default to '1' if current state cannot be read
-    current_state = ""
+    
+    # 1. Read command-line argument
+    if len(sys.argv) < 2:
+        print("❌ Error: Missing mode parameter. Usage: python toggle_trigger.py [0|1|2]")
+        print("   0: Entry Mode (Default)")
+        print("   1: Management Mode (BUY Order)")
+        print("   2: Management Mode (SELL Order)")
+        return
+        
+    new_state = sys.argv[1]
+    if new_state not in ["0", "1", "2"]:
+        print("❌ Error: Invalid mode parameter. Must be '0', '1', or '2'.")
+        return
+
+    # 2. Determine description
+    mode_map = {
+        "0": "Entry Mode (Search for opportunities)",
+        "1": "Management Mode (Active BUY Order)",
+        "2": "Management Mode (Active SELL Order)"
+    }
+    mode_desc = mode_map.get(new_state, "Unknown Mode")
     
     try:
-        # 1. Read current state
-        if os.path.exists(TRIGGER_FILE):
-            with open(TRIGGER_FILE, "r") as f:
-                current_state = f.read().strip()
-        else:
-            # If the file does not exist, assume default state '0'
-            print(f"File {TRIGGER_FILE} not found. Creating with default state '0'.")
-            current_state = "0"
-
-        # 2. Determine new state
-        if current_state == "1":
-            # If currently '1' (Management), switch to '0' (Entry)
-            new_state = "0"
-            mode_desc = "Opportunity Search (Mode 0)"
-        else:
-            # If currently '0' (Entry) or empty/error, switch to '1' (Management)
-            new_state = "1"
-            mode_desc = "Order Management (Mode 1)"
-
         # 3. Write new state to file
         with open(TRIGGER_FILE, "w") as f:
             f.write(new_state)
@@ -39,7 +41,7 @@ def toggle_trigger_file():
         print("-" * 40)
         print(f"✅ STATUS UPDATED SUCCESSFULLY!")
         print(f"New Status: {new_state} ({mode_desc})")
-        print(f"Note: Main App will read the new status in the next 15-minute cycle.")
+        print(f"Note: The main application will read the new status in the next 15-minute cycle.")
         print("-" * 40)
 
     except Exception as e:

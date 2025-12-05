@@ -17,3 +17,5 @@ INTERVALS = ["15min", "30min", "1h"]
 
 # File paths
 TRIGGER_FILE = "trigger.txt"
+# NEW: Persistent storage file for shared state across modules
+STATE_FILE = "state.json"
