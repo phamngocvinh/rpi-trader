@@ -5,4 +5,4 @@ chmod +x /home/pi/rpi_nightly/nightly_update.py
 crontab -e
 
 #3 Add to last line
-0 0 * * * /usr/bin/python3 /home/pi/rpi_nightly/nightly_update.py
+50 23 * * * /usr/bin/python3 /home/pi/rpi_nightly/nightly_update.py
